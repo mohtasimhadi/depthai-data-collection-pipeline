@@ -6,21 +6,14 @@ import threading
 import depthai as dai
 from camera_setup.pipeline import get_pipeline
 from utils.host_sync import HostSync
-from utils.calibration import save_calibration
+from utils.general_helper import save_calibration, get_queues
 
 def main(thread, output_dir):
     pipeline = get_pipeline()
     os.makedirs(output_dir+f'/{thread}_depth')
     with dai.Device(pipeline) as device:
-        queues = []
-        queues.append(device.getOutputQueue(name="depth", maxSize=30, blocking=True))
-        queues.append(device.getOutputQueue(name="color", maxSize=30, blocking=True))
-        queues.append(device.getOutputQueue(name="monoL", maxSize=30, blocking=True))
-        queues.append(device.getOutputQueue(name="monoR", maxSize=30, blocking=True))
-        imu_queue = device.getOutputQueue(name='imu', maxSize=30, blocking=True)
-        
+        queues, imu_queue = get_queues()
         sync = HostSync()
-        
         save_calibration(device.readCalibration(), output_dir, thread)
 
 

@@ -1,6 +1,16 @@
 import os, json
 import depthai as dai
 
+def get_queues(device):
+    queues = []
+    queues.append(device.getOutputQueue(name="depth", maxSize=30, blocking=True))
+    queues.append(device.getOutputQueue(name="color", maxSize=30, blocking=True))
+    queues.append(device.getOutputQueue(name="monoL", maxSize=30, blocking=True))
+    queues.append(device.getOutputQueue(name="monoR", maxSize=30, blocking=True))
+    imu_queue = device.getOutputQueue(name='imu', maxSize=30, blocking=True)
+    return queues, imu_queue
+
+
 def save_calibration(calibData, output_dir, thread):
     calib_dict = {
         'left_intrinsics'           : calibData.getCameraIntrinsics(dai.CameraBoardSocket.CAM_B, dai.Size2f(1080, 720)),
