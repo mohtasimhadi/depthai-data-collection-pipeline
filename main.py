@@ -5,6 +5,7 @@ import argparse
 import threading
 import depthai as dai
 from camera_setup.pipeline import *
+from camera_setup.encoders import *
 from utils.host_sync import HostSync
 from utils.general_helper import save_calibration, get_queues, get_files, write_imu
 from camera_setup.xouts import set_depth_xout
@@ -17,24 +18,19 @@ def main(thread, output_dir):
     depth_pipeline = get_depth_pipeline(pipeline, monoL_pipeline, monoR_pipeline)
     color_pipeline = get_color_pipeline(pipeline)
 
-    set_depth_xout(pipeline, depth_pipeline)
-
-
-    color_encoder = pipeline.create(dai.node.VideoEncoder)
-    color_encoder.setDefaultProfilePreset(30, dai.VideoEncoderProperties.Profile.H265_MAIN)
+    color_encoder = get_encoder(pipeline, dai.VideoEncoderProperties.Profile.H265_MAIN)
+    monoL_encoder = get_encoder(pipeline, dai.VideoEncoderProperties.Profile.H264_MAIN)
+    monoR_encoder = get_encoder(pipeline, dai.VideoEncoderProperties.Profile.H264_MAIN)
+    
     color_pipeline.video.link(color_encoder.input)
+    monoL_pipeline.out.link(monoL_encoder.input)
+    monoR_pipeline.out.link(monoR_encoder.input)
+
+    set_depth_xout(pipeline, depth_pipeline)
 
     xout_color = pipeline.create(dai.node.XLinkOut)
     xout_color.setStreamName('color')
     color_encoder.bitstream.link(xout_color.input)
-
-    monoL_encoder = pipeline.create(dai.node.VideoEncoder)
-    monoL_encoder.setDefaultProfilePreset(monoL_pipeline.getFps(), dai.VideoEncoderProperties.Profile.H264_MAIN)
-    monoL_pipeline.out.link(monoL_encoder.input)
-
-    monoR_encoder = pipeline.create(dai.node.VideoEncoder)
-    monoR_encoder.setDefaultProfilePreset(monoR_pipeline.getFps(), dai.VideoEncoderProperties.Profile.H264_MAIN)
-    monoR_pipeline.out.link(monoR_encoder.input)
 
     xout_monoL = pipeline.create(dai.node.XLinkOut)
     xout_monoL.setStreamName('monoL')
