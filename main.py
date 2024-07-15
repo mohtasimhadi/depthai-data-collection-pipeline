@@ -16,7 +16,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if args.o is None or args.o ==  '':
-        print(f"{ERROR}No operation is selected! Try running-\n{LOG+GREEN}python main.py{RESET} --o <operation name>\n{LOG}Valid operations are {YELLOW}{', '.join(map(str, functions.keys()))}{RESET}")
+        print(f"{ERROR}No operation is selected! \n{LOG}Try running: {GREEN} python main.py{RESET} --o <operation name>\n{LOG}Valid operations are {YELLOW}{', '.join(map(str, functions.keys()))}{RESET}")
+        print(f"{LOG}For help, run: {GREEN} python main.py{RESET} -h")
         exit()
 
     func, param_names = functions[args.o]
