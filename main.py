@@ -1,16 +1,13 @@
 import cv2
 import os, json
 import time
+import argparse
 import threading
 import depthai as dai
 from camera_setup.pipeline import get_pipeline
 from utils.host_sync import HostSync
 
-output_dir = 'depthai_output'
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
-
-def main(thread):
+def main(thread, output_dir):
     pipeline = get_pipeline()
     os.makedirs(output_dir+f'/{thread}_depth')
     with dai.Device(pipeline) as device:
@@ -84,8 +81,16 @@ def main(thread):
 
 
 if __name__ == "__main__":
-    thread_01 = threading.Thread(target=main, args=('thread_01', ))
-    thread_02 = threading.Thread(target=main, args=('thread_02', ))
+
+    parser = argparse.ArgumentParser(description="DepthAI Data Collection Pipeline")
+    parser.add_argument('--output_dir', type=str, required=True, help='Directory where the data will be recorded.')
+    args = parser.parse_args()
+
+    output_dir = args.output_dir
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    thread_01 = threading.Thread(target=main, args=('thread_01', output_dir))
+    thread_02 = threading.Thread(target=main, args=('thread_02', output_dir))
     thread_01.start()
     time.sleep(2)
     thread_02.start()
