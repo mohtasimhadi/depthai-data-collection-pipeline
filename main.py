@@ -12,7 +12,7 @@ def main(thread, output_dir):
     pipeline = get_pipeline()
     os.makedirs(output_dir+f'/{thread}_depth')
     with dai.Device(pipeline) as device:
-        queues, imu_queue = get_queues()
+        queues, imu_queue = get_queues(device)
         sync = HostSync()
         save_calibration(device.readCalibration(), output_dir, thread)
         file_color, file_monoL, file_monoR, file_imus = get_files(output_dir, thread)
