@@ -6,7 +6,7 @@ import threading
 import depthai as dai
 from camera_setup.pipeline import get_pipeline
 from utils.host_sync import HostSync
-from utils.general_helper import save_calibration, get_queues, get_files
+from utils.general_helper import save_calibration, get_queues, get_files, write_imu
 
 def main(thread, output_dir):
     pipeline = get_pipeline()
@@ -19,29 +19,7 @@ def main(thread, output_dir):
         print(f'{thread} started...')
         try:
             while True:
-                imu_message = imu_queue.get()
-                for imu_packet in imu_message.packets:
-                    acceleroValues = imu_packet.acceleroMeter
-                    gyroValues = imu_packet.gyroscope
-                    acceleroTs = acceleroValues.getTimestampDevice()
-                    gyroTs = gyroValues.getTimestampDevice()
-
-                    imu_data = {
-                        "acceleroMeter" : {
-                            "x": acceleroValues.x,
-                            "y": acceleroValues.y,
-                            "z": acceleroValues.z,
-                            "timestamp": acceleroTs
-                        },
-                        "gyroscope"     : {
-                            "x": gyroValues.x,
-                            "y": gyroValues.y,
-                            "z": gyroValues.z,
-                            "timestamp": gyroTs
-                        }
-                    }
-                    file_imus.write(("{'imu_timestamp': '" + str(imu_message.getTimestampDevice()) + "',    'IMU': " + str(imu_data) + '\n').encode())
-
+                write_imu(imu_queue.get(), file_imus)
                 for queue in queues:
                     new_message = queue.get()
                     message = sync.add_msg(queue.getName(), new_message)
