@@ -7,9 +7,6 @@ output_dir = 'depthai_output'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-def timeDeltaToMilliS(td):
-    return td.total_seconds() * 1000
-
 pipeline = get_pipeline()
 
 with dai.Device(pipeline) as device:
@@ -83,10 +80,8 @@ with dai.Device(pipeline) as device:
                 if message:
                     file_depth.write(message['depth'].getData())
                     file_color.write(message['color'].getData())
-                    # message['color'].getData().tofile(file_color)
                     file_monoL.write(message['monoL'].getData())
                     file_monoR.write(message['monoR'].getData())
-                    # print(str(message['monoR'].getData()))
                     file_times.write(("{'camera_timestamp': '" + str(message['depth'].getTimestampDevice()) + "', 'frame_number': " + str(message['depth'].getSequenceNum())+"}\n").encode())
     except KeyboardInterrupt:
         pass
