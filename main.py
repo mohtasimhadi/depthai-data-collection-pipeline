@@ -4,11 +4,9 @@ import time
 import argparse
 import threading
 import depthai as dai
-from camera_setup.pipeline import *
-from camera_setup.encoders import *
+from recording import *
 from utils.host_sync import HostSync
 from utils.general_helper import save_calibration, get_queues, get_files, write_imu
-from camera_setup.xouts import get_xout, set_depth_xout
 
 def main(thread, output_dir):
     pipeline = dai.Pipeline()
@@ -36,7 +34,6 @@ def main(thread, output_dir):
     color_encoder.bitstream.link(xout_color.input)
     monoL_encoder.bitstream.link(xout_monoL.input)
     monoR_encoder.bitstream.link(xout_monoR.input)
-
 
     imu_pipeline.enableIMUSensor([dai.IMUSensor.ACCELEROMETER_RAW, dai.IMUSensor.GYROSCOPE_RAW], 120)
     imu_pipeline.setBatchReportThreshold(1)
