@@ -27,3 +27,11 @@ def save_calibration(calibData, output_dir, thread):
     file_calibration = os.path.join(output_dir, f'{thread}_calibration.json')
     with open(file_calibration, 'w') as f:
         json.dump(calib_dict, f, indent=4)
+
+def get_files(output_dir, thread):
+    file_color = open(os.path.join(output_dir, f'{thread}_color.h265'), 'wb')
+    file_monoL = open(os.path.join(output_dir, f'{thread}_monoL.h264'), 'wb')
+    file_monoR = open(os.path.join(output_dir, f'{thread}_monoR.h264'), 'wb')
+    file_imus = open(os.path.join(output_dir, f'{thread}_imu_data.txt'), 'wb')
+
+    return file_color, file_monoL, file_monoR, file_imus

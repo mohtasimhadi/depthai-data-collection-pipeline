@@ -6,7 +6,7 @@ import threading
 import depthai as dai
 from camera_setup.pipeline import get_pipeline
 from utils.host_sync import HostSync
-from utils.general_helper import save_calibration, get_queues
+from utils.general_helper import save_calibration, get_queues, get_files
 
 def main(thread, output_dir):
     pipeline = get_pipeline()
@@ -15,12 +15,7 @@ def main(thread, output_dir):
         queues, imu_queue = get_queues()
         sync = HostSync()
         save_calibration(device.readCalibration(), output_dir, thread)
-
-
-        file_color = open(os.path.join(output_dir, f'{thread}_color.h265'), 'wb')
-        file_monoL = open(os.path.join(output_dir, f'{thread}_monoL.h264'), 'wb')
-        file_monoR = open(os.path.join(output_dir, f'{thread}_monoR.h264'), 'wb')
-        file_imus = open(os.path.join(output_dir, f'{thread}_imu_data.txt'), 'wb')
+        file_color, file_monoL, file_monoR, file_imus = get_files(output_dir, thread)
         print(f'{thread} started...')
         try:
             while True:
