@@ -1,11 +1,10 @@
 import depthai as dai
 
-
 def get_mono_pipeline(pipeline, camera):
-    monoL_pipeline = pipeline.create(dai.node.MonoCamera)
-    monoL_pipeline.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-    monoL_pipeline.setBoardSocket(camera)
-    return monoL_pipeline
+    mono_pipeline = pipeline.create(dai.node.MonoCamera)
+    mono_pipeline.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
+    mono_pipeline.setBoardSocket(camera)
+    return mono_pipeline
 
 def get_depth_pipeline(pipeline, monoL_pipeline, monoR_pipeline):
     depth_pipeline = pipeline.create(dai.node.StereoDepth)
@@ -19,10 +18,12 @@ def get_depth_pipeline(pipeline, monoL_pipeline, monoR_pipeline):
     depth_pipeline.setDepthAlign(dai.CameraBoardSocket.CAM_A)
     return depth_pipeline
 
-
 def get_color_pipeline(pipeline):
     color_pipeline = pipeline.create(dai.node.ColorCamera)
     color_pipeline.setBoardSocket(dai.CameraBoardSocket.CAM_A)
     color_pipeline.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
     color_pipeline.setFps(30)
     return color_pipeline
+
+def get_imu_pipeline(pipeline):
+    return pipeline.create(dai.node.IMU)

@@ -8,7 +8,7 @@ from camera_setup.pipeline import *
 from camera_setup.encoders import *
 from utils.host_sync import HostSync
 from utils.general_helper import save_calibration, get_queues, get_files, write_imu
-from camera_setup.xouts import set_depth_xout
+from camera_setup.xouts import get_xout, set_depth_xout
 
 def main(thread, output_dir):
     pipeline = dai.Pipeline()
@@ -17,6 +17,7 @@ def main(thread, output_dir):
     monoR_pipeline = get_mono_pipeline(pipeline, dai.CameraBoardSocket.CAM_C)
     depth_pipeline = get_depth_pipeline(pipeline, monoL_pipeline, monoR_pipeline)
     color_pipeline = get_color_pipeline(pipeline)
+    imu_pipeline   = get_imu_pipeline(pipeline)
 
     color_encoder = get_encoder(pipeline, dai.VideoEncoderProperties.Profile.H265_MAIN)
     monoL_encoder = get_encoder(pipeline, dai.VideoEncoderProperties.Profile.H264_MAIN)
@@ -27,22 +28,16 @@ def main(thread, output_dir):
     monoR_pipeline.out.link(monoR_encoder.input)
 
     set_depth_xout(pipeline, depth_pipeline)
+    xout_color = get_xout(pipeline, 'color')
+    xout_monoL = get_xout(pipeline, 'monoL')
+    xout_monoR = get_xout(pipeline, 'monoR')
+    xout_imu   = get_xout(pipeline, 'imu')
 
-    xout_color = pipeline.create(dai.node.XLinkOut)
-    xout_color.setStreamName('color')
     color_encoder.bitstream.link(xout_color.input)
-
-    xout_monoL = pipeline.create(dai.node.XLinkOut)
-    xout_monoL.setStreamName('monoL')
     monoL_encoder.bitstream.link(xout_monoL.input)
-
-    xout_monoR = pipeline.create(dai.node.XLinkOut)
-    xout_monoR.setStreamName('monoR')
     monoR_encoder.bitstream.link(xout_monoR.input)
 
-    imu_pipeline = pipeline.create(dai.node.IMU)
-    xout_imu   = pipeline.createXLinkOut()
-    xout_imu.setStreamName("imu")
+
     imu_pipeline.enableIMUSensor([dai.IMUSensor.ACCELEROMETER_RAW, dai.IMUSensor.GYROSCOPE_RAW], 120)
     imu_pipeline.setBatchReportThreshold(1)
     imu_pipeline.setMaxBatchReports(30)
