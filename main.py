@@ -4,38 +4,21 @@ import time
 import argparse
 import threading
 import depthai as dai
+from camera_setup.pipeline import *
 from utils.host_sync import HostSync
 from utils.general_helper import save_calibration, get_queues, get_files, write_imu
+from camera_setup.xouts import set_depth_xout
 
 def main(thread, output_dir):
     pipeline = dai.Pipeline()
 
-    monoL_pipeline = pipeline.create(dai.node.MonoCamera)
-    monoL_pipeline.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-    monoL_pipeline.setBoardSocket(dai.CameraBoardSocket.CAM_B)
+    monoL_pipeline = get_mono_pipeline(pipeline, dai.CameraBoardSocket.CAM_B)
+    monoR_pipeline = get_mono_pipeline(pipeline, dai.CameraBoardSocket.CAM_C)
+    depth_pipeline = get_depth_pipeline(pipeline, monoL_pipeline, monoR_pipeline)
+    color_pipeline = get_color_pipeline(pipeline)
 
-    monoR_pipeline = pipeline.create(dai.node.MonoCamera)
-    monoR_pipeline.setResolution(dai.MonoCameraProperties.SensorResolution.THE_720_P)
-    monoR_pipeline.setBoardSocket(dai.CameraBoardSocket.CAM_C)
+    set_depth_xout(pipeline, depth_pipeline)
 
-    depth_pipeline = pipeline.create(dai.node.StereoDepth)
-    depth_pipeline.setDefaultProfilePreset(dai.node.StereoDepth.PresetMode.HIGH_DENSITY)
-    depth_pipeline.initialConfig.setMedianFilter(dai.MedianFilter.KERNEL_7x7)
-    depth_pipeline.setLeftRightCheck(True)
-    depth_pipeline.setExtendedDisparity(False)
-    depth_pipeline.setSubpixel(False)
-    monoL_pipeline.out.link(depth_pipeline.left)
-    monoR_pipeline.out.link(depth_pipeline.right)
-    depth_pipeline.setDepthAlign(dai.CameraBoardSocket.CAM_A)
-
-    xout_depth = pipeline.create(dai.node.XLinkOut)
-    xout_depth.setStreamName("depth")
-    depth_pipeline.depth.link(xout_depth.input)
-
-    color_pipeline = pipeline.create(dai.node.ColorCamera)
-    color_pipeline.setBoardSocket(dai.CameraBoardSocket.CAM_A)
-    color_pipeline.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-    color_pipeline.setFps(30)
 
     color_encoder = pipeline.create(dai.node.VideoEncoder)
     color_encoder.setDefaultProfilePreset(30, dai.VideoEncoderProperties.Profile.H265_MAIN)
