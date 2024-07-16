@@ -1,3 +1,4 @@
+import cv2
 import os, json
 import depthai as dai
 
@@ -58,3 +59,14 @@ def write_imu(imu_message, file_imus):
             }
         }
         file_imus.write(("{'imu_timestamp': '" + str(imu_message.getTimestampDevice()) + "',    'IMU': " + str(imu_data) + '\n').encode())
+
+def read_h264(file_path):
+    cap = cv2.VideoCapture(file_path)
+    frames = []
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frames.append(frame)
+    cap.release()
+    return frames
