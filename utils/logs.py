@@ -7,7 +7,3 @@ ERROR       = RED    +  "[Error]    "   +RESET
 WARNING     = YELLOW +  "[Warning]  "   +RESET
 LOG         = BLUE   +  "[Log]      "   +RESET
 SUCCESS     = GREEN  +  "[Success]  "   +RESET
-
-def no_camera_found():
-    print(f"{WARNING}No devices found!")
-    exit()
