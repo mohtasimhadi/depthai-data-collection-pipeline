@@ -1,6 +1,6 @@
 import argparse
 from utils.logs import *
-from modules.recording import start_recording
+from modules import start_recording
 
 functions = {
     'record'        : (start_recording, ['out_dir'])

@@ -4,7 +4,7 @@ import time
 import argparse
 import threading
 import depthai as dai
-from recording import *
+from .camera import *
 from utils.host_sync import HostSync
 from utils.general_helper import save_calibration, get_queues, get_files, write_imu
 
