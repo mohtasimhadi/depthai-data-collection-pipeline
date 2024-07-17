@@ -1,7 +1,7 @@
 # Installation
 1. Clone the repository
 ```bash
-git clone https://github.com/mohtasimhadi/depthai-pipeline.git
+git clone https://github.com/mohtasimhadi/depthai-data-collection-pipeline.git
 cd depthai-pipeline
 ```
 2. Create and activate python virtual environment. *Python-3.11.0* was used during development.
