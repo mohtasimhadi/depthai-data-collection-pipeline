@@ -18,5 +18,5 @@ pip install -r requirements.txt
 # Usage
 
 ```bash
-python main.py -o record <output_directory>
+python main.py --o record --out_dir <output_directory>
 ```
