@@ -1,5 +1,2 @@
-env
-__pycache__
-depthai_output
 .vscode
-*.ipynb
+build
