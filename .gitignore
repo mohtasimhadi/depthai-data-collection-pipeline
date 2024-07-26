@@ -1,3 +1,4 @@
 prev
 env
 .vscode
+__pycache__
