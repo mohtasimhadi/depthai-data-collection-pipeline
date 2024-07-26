@@ -2,29 +2,6 @@ import pickle
 import zmq
 from modules.depthai.utils import *
 
-
-def imu_data_processing(imu_message):
-    for imu_packet in imu_message.packets:
-        acceleroValues = imu_packet.acceleroMeter
-        gyroValues = imu_packet.gyroscope
-        acceleroTs = acceleroValues.getTimestampDevice()
-        gyroTs = gyroValues.getTimestampDevice()
-
-        return {
-            "acceleroMeter" : {
-                "x": acceleroValues.x,
-                "y": acceleroValues.y,
-                "z": acceleroValues.z,
-                "timestamp": acceleroTs
-            },
-            "gyroscope"     : {
-                "x": gyroValues.x,
-                "y": gyroValues.y,
-                "z": gyroValues.z,
-                "timestamp": gyroTs
-            }
-        }
-
 def create_pipeline():
     pipeline = dai.Pipeline()
 
@@ -70,21 +47,20 @@ def publish():
         queues, imu_queue = get_queues(device)
         sync = HostSync()
         print("Publisher started...")
-
-        try:
-            while True:
-                for queue in queues:
-                    message = sync.add_msg(queue.getName(), queue.get())
-                    if message:
-                        
-                        buffer = pickle.dumps({
-                            "color": message['color'].getData(),
-                            "monoL": message['monoL'].getData(),
-                            "monoR": message['monoR'].getData(),
-                            "depth": message['depth'].getData(),
-                            "imu"  : imu_data_processing(imu_queue.get())
-                        })
-                        publisher.send(buffer)
-                        print("Publishing data...")
-        except KeyboardInterrupt:
-            print("Publisher stopped.")
+        while True:
+            for queue in queues:
+                message = sync.add_msg(queue.getName(), queue.get())
+                if message:
+                    
+                    buffer = pickle.dumps({
+                        "color": message['color'].getData(),
+                        "monoL": message['monoL'].getData(),
+                        "monoR": message['monoR'].getData(),
+                        "depth": {
+                            "frame":     message['depth'].getFrame(),
+                            "timestamp": message['depth'].getTimestampDevice(),
+                            "sequence":  message['depth'].getSequenceNum()
+                            },
+                        "imu"  : imu_data_processing(imu_queue.get())
+                    })
+                    publisher.send(buffer)
